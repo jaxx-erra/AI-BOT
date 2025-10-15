@@ -2,10 +2,19 @@ import os
 import google.generativeai as genai
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from flask import Flask
+from threading import Thread
 
 #Configure Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
+
+#Flask app for uptime
+app = Flask(_name_)
+
+@app.route('/')
+def home():
+    return "Bot is running!"
 
 #/start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -21,12 +30,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply = response.text
     except Exception:
         reply = "Sorry jaan, kuch galti ho gayi 💔."
-
     await update.message.reply_text(reply)
 
-#Main function
+def run_flask():
+    app.run(host="0.0.0.0", port=10000)
+
 if __name__ == "_main_":
-    app = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    app.run_polling()
+    # Start Flask app in a separate thread
+    Thread(target=run_flask).start()
+
+    # Start Telegram bot
+    app_bot = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
+    app_bot.add_handler(CommandHandler("start", start))
+    app_bot.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app_bot.run_polling()
