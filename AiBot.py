@@ -35,7 +35,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def run_flask():
     app.run(host="0.0.0.0", port=10000)
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     # Start Flask app in a separate thread
     Thread(target=run_flask).start()
 
