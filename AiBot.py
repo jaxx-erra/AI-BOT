@@ -10,7 +10,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
 #Flask app for uptime
-app = Flask(_name_)
+app = Flask(__name__)
 
 @app.route('/')
 def home():
